@@ -11,17 +11,17 @@ for page_num in range(1, 10):
     response = requests.get(url)
     content = BeautifulSoup(response.text, 'lxml')
 
-    links = content.findAll('h3', {'class': 'gs_ai_name'})
-    name = content.findAll('div', {'class': 'gs_ai_aff'})
-    title = content.findAll('div', {'class': 'gs_ai_int'})
+    links = content.findAll('a', {'class': 'gs_ai_pho'})
+    name = content.findAll('h3', {'class': 'gs_ai_name'})
+    title = content.findAll('div', {'class': 'gs_ai_aff'})
 
     print('\n\nURL:', url)
 
-    for index in range(0, len(links)):
+    for index in range(0, len(name)):
         page = {
-            'name': name[index].text,
+            'title': name[index].text,
             'url': links[index]['href'],
-            'title': title[index].text.strip().replace('\n', ''),
+            'name': name[index].text.strip().replace('\n', ''),
 
         }
 
