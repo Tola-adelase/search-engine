@@ -15,21 +15,26 @@ f = csv.writer(open('No.csv', 'w'))
 f.writerow(['Name', 'Profile'])
 
 start_url = 'https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779'
+diff_pages = 'https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779&after_author' \
+             '=c7lwAM3u__8J&astart=20 '
+
 response = requests.get(start_url, headers=headers)
 content = BeautifulSoup(response.text, 'lxml')
 
-page_count_links = content.findAll('button',
-                                   {'type': 'button'})
+pond = requests.get(diff_pages, headers=headers)
+moss = content1 = BeautifulSoup(pond.text, 'lxml')
+
+page_count_links = moss.findAll('button', {'type': 'button'})
+# print(page_count_links)
 num_pages = str(page_count_links[1]).split(" ")[8].split("=")[2]
-print(str(page_count_links[1]).split(" ")[8].split("=")[2])
-try:  # Make sure there are more than one page, otherwise, set to 1.
+# print(str(page_count_links[1]).split(" ")[8].split("=")[2])
+try:
     num_pages = str(page_count_links[1]).split(" ")[8].split("=")[2]
 except IndexError:
     num_pages = 1
-
 url_list = ["{}+{}".format(start_url, num_pages)]
 new_url = 'https://scholar.google.co.uk' + num_pages.replace("'", "")
-final_url = new_url.replace("\\","/")
+final_url = new_url.replace("\\", "/")
 print(final_url)
 
 name = content.findAll('h3', {'class': 'gs_ai_name'})
