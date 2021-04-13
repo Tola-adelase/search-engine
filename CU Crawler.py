@@ -1,66 +1,72 @@
-import json
-import re
-
 import requests
 from bs4 import BeautifulSoup
+import json
 import csv
-import time
 
 headers = {
     'User-Agent': 'Adetola Adelase',
     'From': 'adelasea@uni.coventry.ac.uk'
 }
 
-f = csv.writer(open('No.csv', 'w'))
+f = csv.writer(open('Information Retrieval.csv', 'w'))
 f.writerow(['Name', 'Profile'])
 
-start_url = 'https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779'
-diff_pages = 'https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779&after_author' \
-             '=c7lwAM3u__8J&astart=20 '
 
-response = requests.get(start_url, headers=headers)
-content = BeautifulSoup(response.text, 'lxml')
+current_page_url = 'https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779'
+current_page = 1
+num_pages = 3
 
-pond = requests.get(diff_pages, headers=headers)
-moss = content1 = BeautifulSoup(pond.text, 'lxml')
 
-page_count_links = moss.findAll('button', {'type': 'button'})
-# print(page_count_links)
-num_pages = str(page_count_links[1]).split(" ")[8].split("=")[2]
-# print(str(page_count_links[1]).split(" ")[8].split("=")[2])
-try:
-    num_pages = str(page_count_links[1]).split(" ")[8].split("=")[2]
-except IndexError:
-    num_pages = 1
-url_list = ["{}+{}".format(start_url, num_pages)]
-new_url = 'https://scholar.google.co.uk' + num_pages.replace("'", "")
-final_url = new_url.replace("\\", "/")
-print(final_url)
+def next_page_link(page_content):
+    pagination_links = page_content.findAll('button', {'type': 'button'})
+    next_page = str(pagination_links[1]).split(" ")[8].split("=")[2].replace("'", "").replace('"', "")
+    next_page = 'https://scholar.google.co.uk/' + next_page.replace('\\x3d', '=').replace('\\x26', '&')
 
-name = content.findAll('h3', {'class': 'gs_ai_name'})
-links = content.findAll('a', {'class': 'gs_ai_pho'})
-dept = content.findAll('div', {'class': 'gs_ai_aff'})
-title = content.findAll('div', {'class': 'gs_ai_int'})
-papers = content.findAll('a', {'class': 'gsc_a_at'})
-names_on_papers = content.findAll('div', {'class': 'gs_gray'})
+    return next_page
 
-print(len(links), len(name))
 
-for index in range(0, len(links)):
-    page = {
-        'name': name[index].text.strip().replace('\n', ''),
-        'url': 'https://scholar.google.co.uk' + links[index]['href'],
-        'dept': dept[index].text.strip().replace('\n', ''),
-        'title': title[index].text.replace(' ', ', '),
-        # 'papers': start_url + papers[index]['data-href'].strip().replace('\n', ''),
-        # 'names_on_papers': names_on_papers[index].text.strip().replace('\n', ''),
+def process_profiles(page_content):
+    # Extract data from page
+    name = content.findAll('h3', {'class': 'gs_ai_name'})
+    profile_link = content.findAll('a', {'class': 'gs_ai_pho'})
+    dept = content.findAll('div', {'class': 'gs_ai_aff'})
+    topics = content.findAll('div', {'class': 'gs_ai_int'})
+    # articles = process_articles(profile_link)
 
-    }
+    # Push data into datastore
+    for index in range(0, len(profile_link)):
+        page = {
+            'name': name[index].text.strip().replace('\n', ''),
+            'url': 'https://scholar.google.co.uk' + profile_link[index]['href'],
+            'dept': dept[index].text.strip().replace('\n', ''),
+            'topics': topics[index].text.replace(' ', ', ').replace(',', '.'),
+        }
+        print(json.dumps(page, indent=4))
 
-    print(json.dumps(page, indent=4))
+    return
 
-for index in range(0, len(name)):
-    names = name[index].text.strip().replace('\n', '')
-    profile = 'https://scholar.google.co.uk' + links[index]['href']
 
-    # f.writerow([names, profile])
+def process_articles(profile_link):
+    # response = requests.get(profile_link, headers=headers)
+    # content = BeautifulSoup(response.text, 'lxml')
+
+    # Index articles listed on page
+
+    # Add indexed articles to array
+    articles = []
+
+    return articles
+
+
+while current_page <= num_pages:
+    response = requests.get(current_page_url, headers=headers)
+    content = BeautifulSoup(response.text, 'lxml')
+
+    # Process content
+    process_profiles(content)
+
+    # Update current page URL
+    current_page_url = next_page_link(content)
+
+    # Increment current page after processing
+    current_page += 1
