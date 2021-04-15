@@ -1,7 +1,7 @@
 # Importing all the needed libraries
+import json
 import requests
 from bs4 import BeautifulSoup
-import json
 
 headers = {
     'User-Agent': 'Adetola Adelase',
@@ -36,7 +36,7 @@ def process_profiles(page_content):
             'url': profile_link,
             'dept': depts[index].string,
             'topics': user_topics,
-            'articles': process_articles(profile_link)
+            # 'articles': process_articles(profile_link)
         }
         profiles.append(page)
 
@@ -87,4 +87,4 @@ def myCrawler(initial_url, num_pages):
     print(json.dumps(pages, indent=4))
 
 
-myCrawler('https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779', 2)
+myCrawler('https://scholar.google.co.uk/citations?view_op=view_org&hl=en&org=9117984065169182779', 5)
