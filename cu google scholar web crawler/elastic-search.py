@@ -9,7 +9,7 @@ es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 res = es.search(index="cu-scholar", body={
     'query': {
         'match': {
-            'title': 'sonochemistry'
+            'name': 'Mason'
         }
     }
 }

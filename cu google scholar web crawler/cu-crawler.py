@@ -3,9 +3,8 @@ import json
 import requests
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
-from urllib.parse import parse_qs, urlparse
 
-# Elastic search
+# Establishing a connection to Elasticsearch
 es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
 
 headers = {
@@ -13,9 +12,12 @@ headers = {
                   'Chrome/66.0.3359.181 Safari/537.36',
     'Pragma': 'no-cache'
 }
+
+# Indexing for Elasticsearch
 index_name = 'cu-scholar'
 
 
+# Getting the to the next profile page.
 def next_page_link(page_content):
     try:
         _link = page_content.find('button', {'aria-label': 'Next'}).get('onclick')
@@ -29,7 +31,6 @@ def next_page_link(page_content):
 
 def process_profiles(page_content):
     profiles = []
-
     # Scrapped paginated profile link of the staff.
     profile_links = page_content.findAll('a', {'class': 'gs_ai_pho'})
 
@@ -49,6 +50,7 @@ def index_article(article):
 
 
 def fetch_article_data(article_link):
+    # Scrapping for the author(s) name and Id from the articles.
     response = requests.get(article_link, headers=headers)
     content = BeautifulSoup(response.text, 'lxml')
 

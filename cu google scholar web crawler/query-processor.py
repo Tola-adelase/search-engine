@@ -19,5 +19,8 @@ def search(search_term):
         print(hit.url)
         print()
 
-
-search('World malaria report 2015')
+# search('I, cyborg')
+# search('Mason')
+# search('John Allen')
+# search('Improvement in glucose tolerance')
+# search('World malaria report 2015')
